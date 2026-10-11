@@ -1,0 +1,35 @@
+name: run python and Commit Files
+on:
+  schedule:
+    - cron: "0 13 * * *"
+
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r bin/requirements.txt
+
+      - name: Run Python script
+        run: python bin/pull_news_cctv.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit --allow-empty -m "commit generated files, continue if it is empty"
+          git push
